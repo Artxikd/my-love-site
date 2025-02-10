@@ -3,108 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Для моего солнышка</title>
-    <link rel="icon" type="image/png" href="favicon.ico">
+    <title>Люблю тебя ❤️</title>
     <style>
         body {
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            background: linear-gradient(135deg, #ffdde1, #ee9ca7);
-            margin: 0;
             flex-direction: column;
+            height: 100vh;
+            background: linear-gradient(to bottom, #f8c5d6, #f2a1b5);
             text-align: center;
-            font-family: 'Arial', sans-serif;
-        }
-        .video-container {
-            width: 80%;
-            max-width: 800px;
-            position: relative;
+            font-family: Arial, sans-serif;
         }
         video {
-            width: 100%;
+            width: 80%;
+            max-width: 600px;
             border-radius: 15px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            display: none; /* Видео скрыто до нажатия кнопки */
         }
-        .text {
-            font-size: 24px;
-            color: #fff;
-            margin-top: 20px;
-            opacity: 0;
-            animation: fadeIn 2s ease-in-out forwards;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        .memory-link {
-            margin-top: 30px;
-            font-size: 18px;
+        .play-button, .mute-button {
+            background: #ff6b81;
             color: white;
-            text-decoration: none;
-            background: rgba(255, 255, 255, 0.3);
             padding: 10px 20px;
-            border-radius: 10px;
-            transition: 0.3s;
-        }
-        .memory-link:hover {
-            background: rgba(255, 255, 255, 0.5);
-        }
-        .sound-button, .play-button {
-            margin-top: 15px;
-            padding: 10px 20px;
-            background-color: #ff5e78;
-            color: white;
             border: none;
             border-radius: 10px;
             cursor: pointer;
-            transition: 0.3s;
-        }
-        .sound-button:hover, .play-button:hover {
-            background-color: #ff3b5c;
+            font-size: 16px;
+            margin: 10px;
         }
     </style>
 </head>
 <body>
-    <div class="video-container">
-        <video id="myVideo" loop playsinline muted>
-            <source src="https://artxikd.github.io/my-love-site/video.mp4" type="video/mp4">
-            Ваш браузер не поддерживает видео.
-        </video>
-    </div>
-    
-    <button class="play-button" id="playToggle">▶ Включить видео</button>
-    <button class="sound-button" id="soundToggle">🔈 Включить звук</button>
 
-    <div class="text">Люблю тебя, принцесса 💖</div>
-    <div class="text">Для моего солнышка ☀️</div>
-    <a href="memories.html" class="memory-link">Наши воспоминания</a>
+    <video id="myVideo" loop playsinline>
+        <source src="https://drive.google.com/uc?id=1aYvS3YhwLkYYPvs0TjAmN-a51mq30qS3" type="video/mp4">
+        Ваш браузер не поддерживает видео.
+    </video>
+
+    <button class="play-button" onclick="toggleVideo()">▶ Включить видео</button>
+    <button class="mute-button" onclick="toggleMute()" style="display: none;">🔊 Включить звук</button>
+
+    <h2>Люблю тебя, принцесса 💖</h2>
+    <p>Для моего солнышка ☀️</p>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            let video = document.getElementById("myVideo");
-            let soundButton = document.getElementById("soundToggle");
-            let playButton = document.getElementById("playToggle");
+        let video = document.getElementById("myVideo");
+        let playButton = document.querySelector(".play-button");
+        let muteButton = document.querySelector(".mute-button");
 
-            // iPhone блокирует автоигру, поэтому ждем нажатия кнопки
-            playButton.addEventListener("click", function () {
-                video.play().then(() => {
-                    playButton.style.display = "none";
-                }).catch(error => console.log("Ошибка воспроизведения:", error));
-            });
+        function toggleVideo() {
+            if (video.style.display === "none") {
+                video.style.display = "block";
+                video.play();
+                playButton.style.display = "none";
+                muteButton.style.display = "inline-block";
+            }
+        }
 
-            // Переключение звука
-            soundButton.addEventListener("click", function () {
-                if (video.muted) {
-                    video.muted = false;
-                    soundButton.textContent = "🔇 Выключить звук";
-                } else {
-                    video.muted = true;
-                    soundButton.textContent = "🔈 Включить звук";
-                }
-            });
-        });
+        function toggleMute() {
+            video.muted = !video.muted;
+            muteButton.textContent = video.muted ? "🔇 Включить звук" : "🔊 Выключить звук";
+        }
     </script>
+
 </body>
 </html>
