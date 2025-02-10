@@ -50,15 +50,21 @@
         .memory-link:hover {
             background: rgba(255, 255, 255, 0.5);
         }
-        .play-button {
+        .buttons {
             margin-top: 20px;
-            padding: 10px 20px;
-            font-size: 18px;
+        }
+        .button {
+            padding: 10px 15px;
+            font-size: 16px;
             background: #ff5f6d;
             color: white;
             border: none;
             border-radius: 10px;
             cursor: pointer;
+            margin: 5px;
+        }
+        .button:hover {
+            background: #ff4a5e;
         }
     </style>
 </head>
@@ -69,16 +75,26 @@
             Ваш браузер не поддерживает видео.
         </video>
     </div>
-    <button class="play-button" onclick="playVideo()">▶ Включить видео</button>
+    
+    <div class="buttons">
+        <button class="button" onclick="startVideo()">▶ Запустить видео</button>
+        <button class="button" onclick="toggleSound()">🔊 Вкл/Выкл звук</button>
+    </div>
+
     <div class="text">Люблю тебя, принцесса 💖</div>
     <div class="text">Для моего солнышка ☀️</div>
     <a href="memories.html" class="memory-link">Наши воспоминания</a>
 
     <script>
-        function playVideo() {
-            let video = document.getElementById("myVideo");
+        let video = document.getElementById("myVideo");
+
+        function startVideo() {
             video.muted = false; // Включаем звук
             video.play().catch(error => console.log("Ошибка воспроизведения:", error));
+        }
+
+        function toggleSound() {
+            video.muted = !video.muted; // Переключаем звук
         }
     </script>
 </body>
