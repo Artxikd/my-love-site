@@ -50,20 +50,40 @@
         .memory-link:hover {
             background: rgba(255, 255, 255, 0.5);
         }
+        .sound-button {
+            margin-top: 15px;
+            font-size: 18px;
+            padding: 10px 20px;
+            border: none;
+            background: white;
+            color: #ee9ca7;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .sound-button:hover {
+            background: #ffdde1;
+        }
     </style>
 </head>
 <body>
     <div class="video-container">
-        <video id="myVideo" autoplay loop playsinline>
-            <source src="https://artxikd.github.io/my-love-site/video.mp4"> type="video/mp4">
+        <video id="myVideo" autoplay loop muted playsinline>
+            <source src="https://artxikd.github.io/my-love-site/video.mp4" type="video/mp4">
             Ваш браузер не поддерживает видео.
         </video>
     </div>
+    <button class="sound-button" onclick="toggleSound()">🔊 Включить звук</button>
     <div class="text">Люблю тебя, принцесса 💖</div>
     <div class="text">Для моего солнышка ☀️</div>
     <a href="memories.html" class="memory-link">Наши воспоминания</a>
 
     <script>
+        function toggleSound() {
+            let video = document.getElementById("myVideo");
+            video.muted = !video.muted;
+        }
+
         document.addEventListener("DOMContentLoaded", function () {
             let video = document.getElementById("myVideo");
             video.load(); // Принудительная загрузка
