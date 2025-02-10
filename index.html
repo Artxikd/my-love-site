@@ -10,11 +10,13 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background: linear-gradient(135deg, #ffdde1, #ee9ca7);
             margin: 0;
             flex-direction: column;
             text-align: center;
             font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #ffdde1, #ee9ca7);
+            background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255, 255, 255, 0.2) 10px, rgba(255, 255, 255, 0.2) 12px);
+            color: #fff;
         }
         .video-container {
             width: 80%;
@@ -29,7 +31,6 @@
         }
         .text {
             font-size: 24px;
-            color: #fff;
             margin-top: 20px;
             opacity: 0;
             animation: fadeIn 2s ease-in-out forwards;
