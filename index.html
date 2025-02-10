@@ -3,68 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Люблю тебя ❤️</title>
+    <title>Для моего солнышка</title>
     <style>
         body {
             display: flex;
             justify-content: center;
             align-items: center;
-            flex-direction: column;
             height: 100vh;
-            background: linear-gradient(to bottom, #f8c5d6, #f2a1b5);
+            background: linear-gradient(135deg, #ffdde1, #ee9ca7);
+            margin: 0;
+            flex-direction: column;
             text-align: center;
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
         }
-        video {
+        .video-container {
             width: 80%;
-            max-width: 600px;
-            border-radius: 15px;
-            display: none; /* Видео скрыто до нажатия кнопки */
+            max-width: 800px;
+            position: relative;
         }
-        .play-button, .mute-button {
-            background: #ff6b81;
+        iframe {
+            width: 100%;
+            height: 450px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .text {
+            font-size: 24px;
+            color: #fff;
+            margin-top: 20px;
+            opacity: 0;
+            animation: fadeIn 2s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .memory-link {
+            margin-top: 30px;
+            font-size: 18px;
             color: white;
+            text-decoration: none;
+            background: rgba(255, 255, 255, 0.3);
             padding: 10px 20px;
-            border: none;
             border-radius: 10px;
-            cursor: pointer;
-            font-size: 16px;
-            margin: 10px;
+            transition: 0.3s;
+        }
+        .memory-link:hover {
+            background: rgba(255, 255, 255, 0.5);
         }
     </style>
 </head>
 <body>
-
-    <video id="myVideo" loop playsinline>
-        <source src="https://drive.google.com/uc?id=1aYvS3YhwLkYYPvs0TjAmN-a51mq30qS3" type="video/mp4">
-        Ваш браузер не поддерживает видео.
-    </video>
-
-    <button class="play-button" onclick="toggleVideo()">▶ Включить видео</button>
-    <button class="mute-button" onclick="toggleMute()" style="display: none;">🔊 Включить звук</button>
-
-    <h2>Люблю тебя, принцесса 💖</h2>
-    <p>Для моего солнышка ☀️</p>
-
-    <script>
-        let video = document.getElementById("myVideo");
-        let playButton = document.querySelector(".play-button");
-        let muteButton = document.querySelector(".mute-button");
-
-        function toggleVideo() {
-            if (video.style.display === "none") {
-                video.style.display = "block";
-                video.play();
-                playButton.style.display = "none";
-                muteButton.style.display = "inline-block";
-            }
-        }
-
-        function toggleMute() {
-            video.muted = !video.muted;
-            muteButton.textContent = video.muted ? "🔇 Включить звук" : "🔊 Выключить звук";
-        }
-    </script>
-
+    <div class="video-container">
+        <iframe src="https://www.youtube.com/embed/Idvn3ixAc7o?autoplay=1&mute=1&loop=1" allow="autoplay"></iframe>
+    </div>
+    <div class="text">Люблю тебя, принцесса 💖</div>
+    <div class="text">Для моего солнышка ☀️</div>
+    <a href="memories.html" class="memory-link">Наши воспоминания</a>
 </body>
 </html>
