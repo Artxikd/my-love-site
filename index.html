@@ -18,6 +18,7 @@
         }
         video {
             width: 80%;
+            max-width: 800px;
             border-radius: 15px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
@@ -48,12 +49,19 @@
     </style>
 </head>
 <body>
-    <video autoplay loop muted>
-        <source src="2025-02-10 21-00-10 (online-video-cutter.com).mp4" type="video/mp4">
+    <video id="myVideo" autoplay loop muted playsinline>
+        <source src="video.mp4" type="video/mp4">
         Ваш браузер не поддерживает видео.
     </video>
     <div class="text">Люблю тебя, принцесса 💖</div>
     <div class="text">Для моего солнышка ☀️</div>
     <a href="memories.html" class="memory-link">Наши воспоминания</a>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let video = document.getElementById("myVideo");
+            video.load(); // Принудительная загрузка
+        });
+    </script>
 </body>
 </html>
