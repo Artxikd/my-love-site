@@ -124,21 +124,21 @@
             apiKey: "AIzaSyDfvVNphWBd8Faz30tj0vOI3vBKcHHnh9Q",
             authDomain: "love-memories-d6c7a.firebaseapp.com",
             projectId: "love-memories-d6c7a",
-            storageBucket: "love-memories-d6c7a.firebasestorage.app",
+            storageBucket: "love-memories-d6c7a.appspot.com",
             messagingSenderId: "301718393815",
             appId: "1:301718393815:web:2edc486d8561ae6c2c7192"
         };
 
         // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        const app = firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore(app);
 
         // Save memory to Firebase
         async function saveMemory() {
             let memory = document.getElementById('memory').value;
             if (memory) {
                 try {
-                    await addDoc(collection(db, "memories"), {
+                    await db.collection("memories").add({
                         content: memory,
                         createdAt: new Date()
                     });
@@ -152,7 +152,7 @@
 
         // Display memories from Firebase
         async function displayMemories() {
-            const querySnapshot = await getDocs(collection(db, "memories"));
+            const querySnapshot = await db.collection("memories").get();
             const memoryList = document.getElementById('memoryList');
             memoryList.innerHTML = '';  // Clear old memories
 
