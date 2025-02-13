@@ -85,15 +85,19 @@
             cursor: pointer;
             color: white;
         }
-        .heart {
-            position: absolute;
-            color: red;
-            font-size: 24px;
-            animation: floatUp 5s linear infinite;
+        .memory-list {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
         }
-        @keyframes floatUp {
-            from { transform: translateY(100vh); opacity: 1; }
-            to { transform: translateY(-10vh); opacity: 0; }
+        .memory-item {
+            background: rgba(255, 255, 255, 0.3);
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
         }
     </style>
 </head>
@@ -109,27 +113,59 @@
         <textarea id="memory" placeholder="Оставь здесь свои воспоминания..."></textarea>
         <button class="submit-button" onclick="saveMemory()">Сохранить</button>
     </div>
-    
+    <div class="memory-list" id="memoryList"></div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore.js"></script>
     <script>
-        function saveMemory() {
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDfvVNphWBd8Faz30tj0vOI3vBKcHHnh9Q",
+            authDomain: "love-memories-d6c7a.firebaseapp.com",
+            projectId: "love-memories-d6c7a",
+            storageBucket: "love-memories-d6c7a.firebasestorage.app",
+            messagingSenderId: "301718393815",
+            appId: "1:301718393815:web:2edc486d8561ae6c2c7192"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Save memory to Firebase
+        async function saveMemory() {
             let memory = document.getElementById('memory').value;
             if (memory) {
-                alert('Спасибо за твоё воспоминание! 💖');
-                localStorage.setItem('userMemory', memory);
-                document.getElementById('memory').value = '';
+                try {
+                    await addDoc(collection(db, "memories"), {
+                        content: memory,
+                        createdAt: new Date()
+                    });
+                    document.getElementById('memory').value = '';
+                    displayMemories();
+                } catch (e) {
+                    console.error("Ошибка добавления воспоминания: ", e);
+                }
             }
         }
 
-        function createHeart() {
-            const heart = document.createElement('div');
-            heart.innerHTML = '❤️';
-            heart.classList.add('heart');
-            heart.style.left = Math.random() * 100 + 'vw';
-            heart.style.animationDuration = Math.random() * 3 + 2 + 's';
-            document.body.appendChild(heart);
-            setTimeout(() => heart.remove(), 5000);
+        // Display memories from Firebase
+        async function displayMemories() {
+            const querySnapshot = await getDocs(collection(db, "memories"));
+            const memoryList = document.getElementById('memoryList');
+            memoryList.innerHTML = '';  // Clear old memories
+
+            querySnapshot.forEach((doc) => {
+                let memory = doc.data().content;
+                let div = document.createElement('div');
+                div.classList.add('memory-item');
+                div.innerText = memory;
+                memoryList.appendChild(div);
+            });
         }
-        setInterval(createHeart, 700);
+
+        window.onload = displayMemories;
     </script>
 </body>
 </html>
