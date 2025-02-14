@@ -28,6 +28,7 @@
             max-width: 600px;
             position: relative;
         }
+
         iframe {
             width: 100%;
             height: 350px;
@@ -126,7 +127,6 @@
         .delete-button:hover {
             color: darkred;
         }
-
     </style>
 </head>
 <body>
@@ -143,9 +143,9 @@
     </div>
     <div class="memory-list" id="memoryList"></div>
 
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore.js"></script>
+    <!-- Firebase SDK (старый способ подключения) -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
     <script>
         // Firebase configuration
         const firebaseConfig = {
@@ -158,8 +158,8 @@
         };
 
         // Инициализация Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore(app);
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
 
         // Функция для сохранения воспоминания
         async function saveMemory() {
@@ -172,9 +172,11 @@
                         createdAt: new Date()
                     });
                     document.getElementById('memory').value = ''; // Очищаем поле ввода
+                    alert("Воспоминание сохранено!"); // Показываем уведомление
                     displayMemories(); // Обновляем список воспоминаний
                 } catch (error) {
                     console.error("Ошибка добавления воспоминания: ", error);
+                    alert("Произошла ошибка при сохранении воспоминания.");
                 }
             } else {
                 alert("Пожалуйста, напишите воспоминание!");
@@ -183,17 +185,22 @@
 
         // Функция для отображения воспоминаний
         async function displayMemories() {
-            const querySnapshot = await db.collection("memories").orderBy("createdAt", "desc").get();
-            const memoryList = document.getElementById('memoryList');
-            memoryList.innerHTML = '';  // Очищаем старые воспоминания
+            try {
+                const querySnapshot = await db.collection("memories").orderBy("createdAt", "desc").get();
+                const memoryList = document.getElementById('memoryList');
+                memoryList.innerHTML = '';  // Очищаем старые воспоминания
 
-            querySnapshot.forEach((doc) => {
-                let memory = doc.data().content;
-                let div = document.createElement('div');
-                div.classList.add('memory-item');
-                div.innerHTML = `${memory} <button class="delete-button" onclick="deleteMemory('${doc.id}')">🗑️</button>`;
-                memoryList.appendChild(div);
-            });
+                querySnapshot.forEach((doc) => {
+                    let memory = doc.data().content;
+                    let div = document.createElement('div');
+                    div.classList.add('memory-item');
+                    div.innerHTML = `${memory} <button class="delete-button" onclick="deleteMemory('${doc.id}')">🗑️</button>`;
+                    memoryList.appendChild(div);
+                });
+            } catch (error) {
+                console.error("Ошибка загрузки воспоминаний: ", error);
+                alert("Не удалось загрузить воспоминания.");
+            }
         }
 
         // Функция для удаления воспоминания
@@ -203,6 +210,7 @@
                 displayMemories(); // Обновляем список воспоминаний
             } catch (error) {
                 console.error("Ошибка удаления воспоминания: ", error);
+                alert("Произошла ошибка при удалении воспоминания.");
             }
         }
 
