@@ -122,6 +122,9 @@
             padding: 10px;
             margin: 5px 0;
             border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         /* Плавная анимация пульсации для сердец */
@@ -208,6 +211,18 @@
             }
         }
 
+        // Функция для удаления воспоминания
+        async function deleteMemory(memoryId) {
+            try {
+                await db.collection("memories").doc(memoryId).delete();
+                displayMemories(); // Обновляем список после удаления
+                alert("Воспоминание удалено!");
+            } catch (error) {
+                console.error("Ошибка при удалении воспоминания: ", error);
+                alert("Не удалось удалить воспоминание.");
+            }
+        }
+
         // Функция для отображения воспоминаний
         async function displayMemories() {
             try {
@@ -217,9 +232,13 @@
 
                 querySnapshot.forEach((doc) => {
                     let memory = doc.data().content;
+                    let memoryId = doc.id;  // Получаем ID документа
                     let div = document.createElement('div');
                     div.classList.add('memory-item');
-                    div.innerText = memory;
+                    div.innerHTML = `
+                        <span>${memory}</span>
+                        <button onclick="deleteMemory('${memoryId}')">Удалить</button>
+                    `;
                     memoryList.appendChild(div);
                 });
             } catch (error) {
