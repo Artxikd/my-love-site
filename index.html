@@ -15,25 +15,12 @@
             flex-direction: column;
             text-align: center;
             font-family: 'Nexa Script', cursive;
-            background-color: #d68db3; /* Темный основной фон */
+            background: #f7d3e0;
             background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="500" height="500"%3E%3Ctext x="10" y="50" font-size="60" fill="rgba(255, 255, 255, 0.2)" font-family="Nexa%20Script" transform="rotate(45 10,50)"%3EI%20love%20you%3C/text%3E%3C/svg%3E');
             background-repeat: repeat;
             background-size: 150px 150px;
             color: #fff;
             overflow: hidden;
-            position: relative;
-        }
-
-        /* Добавляем полупрозрачный темный слой */
-        ::after {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.3); /* Темный полупрозрачный слой */
-            z-index: -1;
         }
 
         .video-container {
@@ -41,7 +28,6 @@
             max-width: 600px;
             position: relative;
         }
-
         iframe {
             width: 100%;
             height: 350px;
@@ -127,34 +113,18 @@
             align-items: center;
         }
 
-        /* Анимация для маленьких сердечек */
-        .heart {
-            position: absolute;
-            bottom: -50px;
-            font-size: 30px;
-            color: rgba(255, 255, 255, 0.8);
-            animation: rise 2s ease-in forwards;
+        /* Стили для кнопки удаления */
+        .delete-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            color: red;
+            transition: color 0.3s ease;
         }
 
-        @keyframes rise {
-            0% {
-                bottom: -50px;
-                opacity: 1;
-            }
-            100% {
-                bottom: 100vh;
-                opacity: 0;
-            }
-        }
-
-        /* Множество сердечек */
-        .hearts-container {
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100%;
-            pointer-events: none;
+        .delete-button:hover {
+            color: darkred;
         }
 
     </style>
@@ -173,12 +143,9 @@
     </div>
     <div class="memory-list" id="memoryList"></div>
 
-    <!-- Множество маленьких сердечек -->
-    <div class="hearts-container" id="heartsContainer"></div>
-
     <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore.js"></script>
     <script>
         // Firebase configuration
         const firebaseConfig = {
@@ -191,8 +158,8 @@
         };
 
         // Инициализация Firebase
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
+        const app = firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore(app);
 
         // Функция для сохранения воспоминания
         async function saveMemory() {
@@ -205,71 +172,42 @@
                         createdAt: new Date()
                     });
                     document.getElementById('memory').value = ''; // Очищаем поле ввода
-                    alert("Воспоминание сохранено!"); // Показываем уведомление
                     displayMemories(); // Обновляем список воспоминаний
                 } catch (error) {
                     console.error("Ошибка добавления воспоминания: ", error);
-                    alert("Произошла ошибка при сохранении воспоминания.");
                 }
             } else {
                 alert("Пожалуйста, напишите воспоминание!");
             }
         }
 
-        // Функция для удаления воспоминания
-        async function deleteMemory(memoryId) {
-            try {
-                await db.collection("memories").doc(memoryId).delete();
-                displayMemories(); // Обновляем список после удаления
-                alert("Воспоминание удалено!");
-            } catch (error) {
-                console.error("Ошибка при удалении воспоминания: ", error);
-                alert("Не удалось удалить воспоминание.");
-            }
-        }
-
         // Функция для отображения воспоминаний
         async function displayMemories() {
+            const querySnapshot = await db.collection("memories").orderBy("createdAt", "desc").get();
+            const memoryList = document.getElementById('memoryList');
+            memoryList.innerHTML = '';  // Очищаем старые воспоминания
+
+            querySnapshot.forEach((doc) => {
+                let memory = doc.data().content;
+                let div = document.createElement('div');
+                div.classList.add('memory-item');
+                div.innerHTML = `${memory} <button class="delete-button" onclick="deleteMemory('${doc.id}')">🗑️</button>`;
+                memoryList.appendChild(div);
+            });
+        }
+
+        // Функция для удаления воспоминания
+        async function deleteMemory(id) {
             try {
-                const querySnapshot = await db.collection("memories").orderBy("createdAt", "desc").get();
-                const memoryList = document.getElementById('memoryList');
-                memoryList.innerHTML = '';  // Очищаем старые воспоминания
-
-                querySnapshot.forEach((doc) => {
-                    let memory = doc.data().content;
-                    let memoryId = doc.id;  // Получаем ID документа
-                    let div = document.createElement('div');
-                    div.classList.add('memory-item');
-                    div.innerHTML = `
-                        <span>${memory}</span>
-                        <button onclick="deleteMemory('${memoryId}')">Удалить</button>
-                    `;
-                    memoryList.appendChild(div);
-                });
+                await db.collection("memories").doc(id).delete();
+                displayMemories(); // Обновляем список воспоминаний
             } catch (error) {
-                console.error("Ошибка загрузки воспоминаний: ", error);
-                alert("Не удалось загрузить воспоминания.");
+                console.error("Ошибка удаления воспоминания: ", error);
             }
         }
 
-        // Функция для создания сердечек
-        function createHearts() {
-            const heartsContainer = document.getElementById('heartsContainer');
-            for (let i = 0; i < 10; i++) {  // Создаем 10 сердечек
-                let heart = document.createElement('div');
-                heart.classList.add('heart');
-                heart.innerText = '❤️';
-                heart.style.animationDelay = `${Math.random() * 1}s`;  // Задержка для каждого сердца
-                heart.style.left = `${Math.random() * 100}%`;  // Случайная позиция по горизонтали
-                heartsContainer.appendChild(heart);
-            }
-        }
-
-        // Запускаем создание сердечек при загрузке страницы
-        window.onload = function() {
-            createHearts();
-            displayMemories();
-        };
+        // Загружаем воспоминания при загрузке страницы
+        window.onload = displayMemories;
     </script>
 </body>
 </html>
