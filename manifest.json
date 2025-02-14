@@ -1,20 +1,4 @@
 {
-    "name": "Наши воспоминания",
-    "short_name": "Воспоминания",
-    "description": "Наши общие воспоминания",
-    "start_url": "/",
-    "display": "standalone",
-    "background_color": "#ffffff",
-    "theme_color": "#ffdde1",
-    "icons": [
-        {
-            "src": "icon.png",
-            "sizes": "192x192",
-            "type": "image/png"
-        }
-    ]
-}
-{
     "name": "Для моего солнышка",
     "short_name": "Солнышко",
     "description": "Мои воспоминания о солнышке",
