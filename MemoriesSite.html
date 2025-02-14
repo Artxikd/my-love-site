@@ -3,9 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#f7d3e0">
     <title>Наши воспоминания</title>
     <link href="https://fonts.googleapis.com/css2?family=Nexa+Script&display=swap" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
     <style>
         body {
             display: flex;
@@ -17,7 +20,24 @@
             text-align: center;
             font-family: 'Nexa Script', cursive;
             background: #f7d3e0;
+            background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="500" height="500"%3E%3Ctext x="10" y="50" font-size="60" fill="rgba(255, 255, 255, 0.2)" font-family="Nexa%20Script" transform="rotate(45 10,50)"%3EI%20love%20you%3C/text%3E%3C/svg%3E');
+            background-repeat: repeat;
+            background-size: 150px 150px;
             color: #fff;
+            overflow: hidden;
+            scroll-behavior: smooth;
+        }
+
+        .text {
+            font-size: 28px;
+            margin-top: 20px;
+            opacity: 0;
+            animation: fadeIn 2s ease-in-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         .form-container {
@@ -26,7 +46,7 @@
             align-items: center;
             padding: 20px;
             border-radius: 10px;
-            background: rgba(255, 255, 255, 0.2);
+            margin-top: 20px;
             width: 90%;
             max-width: 500px;
         }
@@ -83,19 +103,59 @@
         .delete-btn:hover {
             color: #ff0000;
         }
+
+        .back-link {
+            margin-top: 20px;
+            font-size: 20px;
+            color: white;
+            text-decoration: none;
+            background: rgba(255, 255, 255, 0.3);
+            padding: 12px 25px;
+            border-radius: 10px;
+            transition: 0.3s;
+        }
+
+        .back-link:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Мобильные стили */
+        @media (max-width: 767px) {
+            body {
+                font-size: 16px;
+            }
+
+            .form-container {
+                font-size: 18px;
+                padding: 10px 20px;
+            }
+
+            .submit-button {
+                font-size: 16px;
+            }
+
+            .memory-list {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
+    <div class="text">Наши воспоминания 💭</div>
+    
     <div class="form-container">
         <textarea id="memory" placeholder="Оставь здесь свои воспоминания..."></textarea>
         <button class="submit-button" onclick="saveMemory()">Сохранить</button>
     </div>
     <div class="memory-list" id="memoryList"></div>
 
+    <a href="index.html" class="back-link">Назад на главную</a>
+
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
     <script>
+        // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyDfvVNphWBd8Faz30tj0vOI3vBKcHHnh9Q",
             authDomain: "love-memories-d6c7a.firebaseapp.com",
@@ -105,34 +165,38 @@
             appId: "1:301718393815:web:2edc486d8561ae6c2c7192"
         };
 
+        // Инициализация Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
+        // Функция для сохранения воспоминания
         async function saveMemory() {
             const memory = document.getElementById('memory').value;
             if (memory) {
                 try {
+                    // Добавляем новое воспоминание в Firestore
                     await db.collection("memories").add({
                         content: memory,
                         createdAt: new Date()
                     });
-                    document.getElementById('memory').value = '';
-                    alert("Воспоминание сохранено!");
-                    displayMemories();
+                    document.getElementById('memory').value = ''; // Очищаем поле ввода
+                    alert("Воспоминание сохранено!"); // Показываем уведомление
+                    displayMemories(); // Обновляем список воспоминаний
                 } catch (error) {
-                    console.error("Ошибка добавления: ", error);
-                    alert("Ошибка при сохранении.");
+                    console.error("Ошибка добавления воспоминания: ", error);
+                    alert("Произошла ошибка при сохранении воспоминания.");
                 }
             } else {
-                alert("Введите воспоминание!");
+                alert("Пожалуйста, напишите воспоминание!");
             }
         }
 
+        // Функция для отображения воспоминаний
         async function displayMemories() {
             try {
                 const querySnapshot = await db.collection("memories").orderBy("createdAt", "desc").get();
                 const memoryList = document.getElementById('memoryList');
-                memoryList.innerHTML = '';
+                memoryList.innerHTML = '';  // Очищаем старые воспоминания
 
                 querySnapshot.forEach((doc) => {
                     let memory = doc.data().content;
@@ -149,21 +213,23 @@
                     memoryList.appendChild(div);
                 });
             } catch (error) {
-                console.error("Ошибка загрузки: ", error);
-                alert("Ошибка загрузки воспоминаний.");
+                console.error("Ошибка загрузки воспоминаний: ", error);
+                alert("Не удалось загрузить воспоминания.");
             }
         }
 
+        // Функция для удаления воспоминания
         async function deleteMemory(id) {
             try {
                 await db.collection("memories").doc(id).delete();
-                displayMemories();
+                displayMemories();  // Обновляем список воспоминаний после удаления
             } catch (error) {
-                console.error("Ошибка удаления: ", error);
-                alert("Ошибка при удалении.");
+                console.error("Ошибка удаления воспоминания: ", error);
+                alert("Не удалось удалить воспоминание.");
             }
         }
 
+        // Загружаем воспоминания при загрузке страницы
         window.onload = displayMemories;
     </script>
 </body>
