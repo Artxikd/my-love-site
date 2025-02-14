@@ -127,31 +127,36 @@
             align-items: center;
         }
 
-        /* Плавная анимация пульсации для сердец */
-        .heart-animation {
+        /* Анимация для маленьких сердечек */
+        .heart {
             position: absolute;
-            top: 30%;
-            left: 50%;
-            transform: translateX(-50%);
-            animation: pulse 3s infinite;
-            font-size: 100px;
-            color: rgba(255, 255, 255, 0.3);
+            bottom: -50px;
+            font-size: 30px;
+            color: rgba(255, 255, 255, 0.8);
+            animation: rise 2s ease-in forwards;
         }
 
-        @keyframes pulse {
+        @keyframes rise {
             0% {
-                transform: translateX(-50%) scale(1);
-                opacity: 0.3;
-            }
-            50% {
-                transform: translateX(-50%) scale(1.2);
+                bottom: -50px;
                 opacity: 1;
             }
             100% {
-                transform: translateX(-50%) scale(1);
-                opacity: 0.3;
+                bottom: 100vh;
+                opacity: 0;
             }
         }
+
+        /* Множество сердечек */
+        .hearts-container {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            pointer-events: none;
+        }
+
     </style>
 </head>
 <body>
@@ -168,8 +173,8 @@
     </div>
     <div class="memory-list" id="memoryList"></div>
 
-    <!-- Сердечко с анимацией пульсации -->
-    <div class="heart-animation">❤️</div>
+    <!-- Множество маленьких сердечек -->
+    <div class="hearts-container" id="heartsContainer"></div>
 
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
@@ -247,8 +252,24 @@
             }
         }
 
-        // Загружаем воспоминания при загрузке страницы
-        window.onload = displayMemories;
+        // Функция для создания сердечек
+        function createHearts() {
+            const heartsContainer = document.getElementById('heartsContainer');
+            for (let i = 0; i < 10; i++) {  // Создаем 10 сердечек
+                let heart = document.createElement('div');
+                heart.classList.add('heart');
+                heart.innerText = '❤️';
+                heart.style.animationDelay = `${Math.random() * 1}s`;  // Задержка для каждого сердца
+                heart.style.left = `${Math.random() * 100}%`;  // Случайная позиция по горизонтали
+                heartsContainer.appendChild(heart);
+            }
+        }
+
+        // Запускаем создание сердечек при загрузке страницы
+        window.onload = function() {
+            createHearts();
+            displayMemories();
+        };
     </script>
 </body>
 </html>
