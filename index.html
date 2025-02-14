@@ -155,9 +155,11 @@
                         createdAt: new Date()
                     });
                     document.getElementById('memory').value = ''; // Очищаем поле ввода
+                    alert("Воспоминание сохранено!"); // Показываем уведомление
                     displayMemories(); // Обновляем список воспоминаний
                 } catch (error) {
                     console.error("Ошибка добавления воспоминания: ", error);
+                    alert("Произошла ошибка при сохранении воспоминания.");
                 }
             } else {
                 alert("Пожалуйста, напишите воспоминание!");
@@ -166,17 +168,22 @@
 
         // Функция для отображения воспоминаний
         async function displayMemories() {
-            const querySnapshot = await db.collection("memories").orderBy("createdAt", "desc").get();
-            const memoryList = document.getElementById('memoryList');
-            memoryList.innerHTML = '';  // Очищаем старые воспоминания
+            try {
+                const querySnapshot = await db.collection("memories").orderBy("createdAt", "desc").get();
+                const memoryList = document.getElementById('memoryList');
+                memoryList.innerHTML = '';  // Очищаем старые воспоминания
 
-            querySnapshot.forEach((doc) => {
-                let memory = doc.data().content;
-                let div = document.createElement('div');
-                div.classList.add('memory-item');
-                div.innerText = memory;
-                memoryList.appendChild(div);
-            });
+                querySnapshot.forEach((doc) => {
+                    let memory = doc.data().content;
+                    let div = document.createElement('div');
+                    div.classList.add('memory-item');
+                    div.innerText = memory;
+                    memoryList.appendChild(div);
+                });
+            } catch (error) {
+                console.error("Ошибка загрузки воспоминаний: ", error);
+                alert("Не удалось загрузить воспоминания.");
+            }
         }
 
         // Загружаем воспоминания при загрузке страницы
