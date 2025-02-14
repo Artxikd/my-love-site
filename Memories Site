@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#f7d3e0">
+    <title>Наши воспоминания</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nexa+Script&display=swap" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            flex-direction: column;
+            text-align: center;
+            font-family: 'Nexa Script', cursive;
+            background: #f7d3e0;
+            color: #fff;
+        }
+
+        .form-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            width: 90%;
+            max-width: 500px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 80px;
+            padding: 10px;
+            border-radius: 10px;
+            border: none;
+            font-size: 16px;
+            margin-bottom: 10px;
+            resize: none;
+        }
+
+        .submit-button {
+            background: rgba(255, 255, 255, 0.3);
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            color: white;
+        }
+
+        .memory-list {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+        }
+
+        .memory-item {
+            background: rgba(255, 255, 255, 0.3);
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .delete-btn {
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            color: #ff4d4d;
+            font-size: 20px;
+            transition: 0.3s;
+        }
+
+        .delete-btn:hover {
+            color: #ff0000;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <textarea id="memory" placeholder="Оставь здесь свои воспоминания..."></textarea>
+        <button class="submit-button" onclick="saveMemory()">Сохранить</button>
+    </div>
+    <div class="memory-list" id="memoryList"></div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDfvVNphWBd8Faz30tj0vOI3vBKcHHnh9Q",
+            authDomain: "love-memories-d6c7a.firebaseapp.com",
+            projectId: "love-memories-d6c7a",
+            storageBucket: "love-memories-d6c7a.appspot.com",
+            messagingSenderId: "301718393815",
+            appId: "1:301718393815:web:2edc486d8561ae6c2c7192"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        async function saveMemory() {
+            const memory = document.getElementById('memory').value;
+            if (memory) {
+                try {
+                    await db.collection("memories").add({
+                        content: memory,
+                        createdAt: new Date()
+                    });
+                    document.getElementById('memory').value = '';
+                    alert("Воспоминание сохранено!");
+                    displayMemories();
+                } catch (error) {
+                    console.error("Ошибка добавления: ", error);
+                    alert("Ошибка при сохранении.");
+                }
+            } else {
+                alert("Введите воспоминание!");
+            }
+        }
+
+        async function displayMemories() {
+            try {
+                const querySnapshot = await db.collection("memories").orderBy("createdAt", "desc").get();
+                const memoryList = document.getElementById('memoryList');
+                memoryList.innerHTML = '';
+
+                querySnapshot.forEach((doc) => {
+                    let memory = doc.data().content;
+                    let div = document.createElement('div');
+                    div.classList.add('memory-item');
+                    div.innerText = memory;
+
+                    let deleteBtn = document.createElement('button');
+                    deleteBtn.classList.add('delete-btn');
+                    deleteBtn.innerHTML = '🗑️';
+                    deleteBtn.onclick = () => deleteMemory(doc.id);
+
+                    div.appendChild(deleteBtn);
+                    memoryList.appendChild(div);
+                });
+            } catch (error) {
+                console.error("Ошибка загрузки: ", error);
+                alert("Ошибка загрузки воспоминаний.");
+            }
+        }
+
+        async function deleteMemory(id) {
+            try {
+                await db.collection("memories").doc(id).delete();
+                displayMemories();
+            } catch (error) {
+                console.error("Ошибка удаления: ", error);
+                alert("Ошибка при удалении.");
+            }
+        }
+
+        window.onload = displayMemories;
+    </script>
+</body>
+</html>
