@@ -21,6 +21,7 @@
             background-size: 150px 150px;
             color: #fff;
             overflow: hidden;
+            scroll-behavior: smooth;
         }
 
         .video-container {
@@ -114,18 +115,41 @@
             align-items: center;
         }
 
-        /* Стили для кнопки удаления */
-        .delete-button {
-            background: none;
+        .delete-btn {
+            background-color: transparent;
             border: none;
             cursor: pointer;
-            font-size: 18px;
-            color: red;
-            transition: color 0.3s ease;
+            color: #ff4d4d;
+            font-size: 20px;
+            transition: 0.3s;
         }
 
-        .delete-button:hover {
-            color: darkred;
+        .delete-btn:hover {
+            color: #ff0000;
+        }
+
+        /* Мобильные стили */
+        @media (max-width: 767px) {
+            body {
+                font-size: 16px;
+            }
+
+            .video-container {
+                max-width: 100%;
+            }
+
+            .memory-link, .form-container {
+                font-size: 18px;
+                padding: 10px 20px;
+            }
+
+            .submit-button {
+                font-size: 16px;
+            }
+
+            .memory-list {
+                width: 100%;
+            }
         }
     </style>
 </head>
@@ -143,7 +167,7 @@
     </div>
     <div class="memory-list" id="memoryList"></div>
 
-    <!-- Firebase SDK (старый способ подключения) -->
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
     <script>
@@ -194,7 +218,14 @@
                     let memory = doc.data().content;
                     let div = document.createElement('div');
                     div.classList.add('memory-item');
-                    div.innerHTML = `${memory} <button class="delete-button" onclick="deleteMemory('${doc.id}')">🗑️</button>`;
+                    div.innerText = memory;
+
+                    let deleteBtn = document.createElement('button');
+                    deleteBtn.classList.add('delete-btn');
+                    deleteBtn.innerHTML = '🗑️';
+                    deleteBtn.onclick = () => deleteMemory(doc.id);
+
+                    div.appendChild(deleteBtn);
                     memoryList.appendChild(div);
                 });
             } catch (error) {
@@ -207,10 +238,10 @@
         async function deleteMemory(id) {
             try {
                 await db.collection("memories").doc(id).delete();
-                displayMemories(); // Обновляем список воспоминаний
+                displayMemories();  // Обновляем список воспоминаний после удаления
             } catch (error) {
                 console.error("Ошибка удаления воспоминания: ", error);
-                alert("Произошла ошибка при удалении воспоминания.");
+                alert("Не удалось удалить воспоминание.");
             }
         }
 
